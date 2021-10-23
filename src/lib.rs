@@ -1,19 +1,26 @@
+//! Send a string text message to webhook
+
+#![warn(missing_docs)]
+
 use reqwest::{Client, Error as ReqError, Response};
 use serde::Serialize;
 
+/// Webhook Sender
 pub struct WebhookSender {
     url: String,
     web_client: Client,
 }
 
 impl WebhookSender {
-    pub fn new<S: Into<String>>(url: S) -> Self {
+    /// Create a new webhook sender
+    pub fn new<S: Into<String>>(webhook_url: S) -> Self {
         Self {
-            url: url.into(),
+            url: webhook_url.into(),
             web_client: Client::new(),
         }
     }
 
+    /// post string message
     pub async fn post(&self, message: &str) -> Result<Response, ReqError> {
         let msg = get_sample_msg(message);
         self.web_client.post(&self.url).json(&msg).send().await
