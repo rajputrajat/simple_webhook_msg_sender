@@ -2,6 +2,7 @@
 
 #![warn(missing_docs)]
 
+use log::{debug, info};
 use reqwest::{Client, Error as ReqError, Response};
 use serde::Serialize;
 
@@ -14,15 +15,19 @@ pub struct WebhookSender {
 impl WebhookSender {
     /// Create a new webhook sender
     pub fn new<S: Into<String>>(webhook_url: S) -> Self {
+        let url = webhook_url.into();
+        debug!("created a new webhook-sender for url: '{}'", url);
         Self {
-            url: webhook_url.into(),
+            url,
             web_client: Client::new(),
         }
     }
 
     /// post string message
     pub async fn post(&self, message: &str) -> Result<Response, ReqError> {
+        info!("message to post: {}", message);
         let msg = get_sample_msg(message);
+        debug!("message encoded as json: {:?}", msg);
         self.web_client.post(&self.url).json(&msg).send().await
     }
 }
